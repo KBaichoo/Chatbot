@@ -1,5 +1,7 @@
 generate_submission.sh
-movielens.py
-repl.py
 data/
-
+..gitignore.un~
+.DS_Store
+.gitignore
+generatee_submission.sh
+ignore.gitignore

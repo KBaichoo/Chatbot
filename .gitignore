@@ -1,1 +1,7 @@
 data/*
+..gitignore.un~
+.DS_Store
+.gitignore
+generate_submission.sh
+movielens.py
+repl.py

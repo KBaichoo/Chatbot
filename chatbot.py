@@ -73,22 +73,29 @@ class Chatbot:
         2) transform the information into a response to the user
       """
 
-      positive_words = open("deps/liked").read().split()
-      pos_set = set(positive_words)
-      print pos_set
+      sentiments = defaultdict(lambda: 0)
+      word_list = open("data/sentiment.txt").read().split()
+      for item in word_list:
+          pairing = item.split(',')
+          if pairing[1]=='neg':
+              sentiments[pairing[0]] = -1
+          else:
+              sentiments[pairing[0]] = 1
 
-      negative_words = open("deps/disliked").read().split()
-      neg_set = set(negative_words)
-      print neg_set
+      supplemental_pos = open("deps/liked").read().split()
+      pos_set = set(supplemental_pos)
+
+      supplemental_neg = open("deps/disliked").read().split()
+      neg_set = set(supplemental_neg)
 
       movie = r"\"(\w+)\""
 
       if self.is_turbo == True:
         response = 'processed %s in creative mode!!' % input
       else:
-          if len(rated)==5:
+          if len(self.rated)==5:
 
-              recommendation = self.
+              # recommendation = self.
 
               response = '''
               Thanks so much! I think you will like \"%s\" based on our chat.
@@ -99,7 +106,7 @@ class Chatbot:
               rated.clear()
               return response
 
-          while len(rated)<6:
+          while len(self.rated)<6:
 
             title = ' '
             parses = []
@@ -115,25 +122,28 @@ class Chatbot:
                 title = parses[0]
 
             words = input.split(' ')
-            sentiment = ' '
             for word in words:
                 if word in pos_set:
-                    rated[title] = 1
-                    sentiment = 'liked'
+                    self.rated[title] = 1
                     break
                 elif word in neg_set:
-                    rated[title] = -1
-                    sentiment = 'disliked'
+                    self.rated[title] = -1
+                    break
+                elif word in sentiments:
+                    self.rated[title] = sentiments[word]
                     break
 
-            if rated[title] == ' ':
+            if self.rated[title] == ' ':
                 response = 'I\'m sorry, I can\'t tell if you liked \"%s\". Can you tell me more about \"%s\"?' % title
                 return response
             else:
+                sentiment = ' '
+                if self.rated[title]==1:
+                    sentiment = 'liked'
+                else:
+                    sentiment = 'disliked'
                 response = "I see you %s \"%s\". Can you tell me about another movie?" % (sentiment, title)
                 return response
-
-
 
       return response
 

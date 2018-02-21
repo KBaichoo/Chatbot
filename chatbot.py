@@ -7,10 +7,9 @@
 ######################################################################
 import csv
 import math
-
-
+import re
 import numpy as np
-
+from collections import defaultdict
 from movielens import ratings
 from random import randint
 
@@ -21,9 +20,10 @@ class Chatbot:
     # `moviebot` is the default chatbot. Change it to your chatbot's name       #
     #############################################################################
     def __init__(self, is_turbo=False):
-      self.name = 'moviebot'
+      self.name = 'reelbot'
       self.is_turbo = is_turbo
       self.read_data()
+      self.rated = defaultdict(lambda: 0)
 
     #############################################################################
     # 1. WARM UP REPL
@@ -35,7 +35,11 @@ class Chatbot:
       # TODO: Write a short greeting message                                      #
       #############################################################################
 
-      greeting_message = 'How can I help you?'
+      greeting_message = """
+      Hi there! Let\'s talk about movies so I can recommend one to you. Tell me about
+      a movie you have seen, and if you liked it!
+      """
+
 
       #############################################################################
       #                             END OF YOUR CODE                              #
@@ -49,7 +53,7 @@ class Chatbot:
       # TODO: Write a short farewell message                                      #
       #############################################################################
 
-      goodbye_message = 'Have a nice day!'
+      goodbye_message = 'Bye for now!'
 
       #############################################################################
       #                             END OF YOUR CODE                              #
@@ -68,15 +72,68 @@ class Chatbot:
         1) extract the relevant information and
         2) transform the information into a response to the user
       """
-      #############################################################################
-      # TODO: Implement the extraction and transformation in this method, possibly#
-      # calling other functions. Although modular code is not graded, it is       #
-      # highly recommended                                                        #
-      #############################################################################
+
+      positive_words = open("deps/liked").read().split()
+      pos_set = set(positive_words)
+      print pos_set
+
+      negative_words = open("deps/disliked").read().split()
+      neg_set = set(negative_words)
+      print neg_set
+
+      movie = r"\"(\w+)\""
+
       if self.is_turbo == True:
         response = 'processed %s in creative mode!!' % input
       else:
-        response = 'processed %s in starter mode' % input
+          if len(rated)==5:
+
+              recommendation = self.
+
+              response = '''
+              Thanks so much! I think you will like \"%s\" based on our chat.
+              If you'd like to hear another recommendation, tell me about another movie!
+              Otherwise, enter :quit to exit :)
+              ''' % recommendation
+
+              rated.clear()
+              return response
+
+          while len(rated)<6:
+
+            title = ' '
+            parses = []
+            parses = re.findall(movie, input)
+
+            if not parses:
+                response = "Sorry, I\'m not sure which movie you're talking about. Can you try again?"
+                return response
+            else:
+                if len(parses) > 1:
+                    response = "Can you tell me about movies one at a time?"
+                    return response
+                title = parses[0]
+
+            words = input.split(' ')
+            sentiment = ' '
+            for word in words:
+                if word in pos_set:
+                    rated[title] = 1
+                    sentiment = 'liked'
+                    break
+                elif word in neg_set:
+                    rated[title] = -1
+                    sentiment = 'disliked'
+                    break
+
+            if rated[title] == ' ':
+                response = 'I\'m sorry, I can\'t tell if you liked \"%s\". Can you tell me more about \"%s\"?' % title
+                return response
+            else:
+                response = "I see you %s \"%s\". Can you tell me about another movie?" % (sentiment, title)
+                return response
+
+
 
       return response
 
